@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel sprzedawcy</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f5f5;
+        }
+
+        .dashboard-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-warning shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-dark" href="/products/">
+            🛒 My Marketplace
+        </a>
+
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-dark fw-semibold">
+                {{ request.user.username }}
+            </span>
+
+            <form method="post" action="/logout/" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-dark btn-sm">
+                    Wyloguj się
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5 mb-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-5">
+
+            <h1 class="mb-4">
+                Witaj, {{ request.user.username }} 👋
+            </h1>
+
+            <p>
+                <strong>Rola:</strong> {{ request.user.role }}
+            </p>
+
+            {% if request.user.company %}
+            <p>
+                <strong>Firma:</strong> {{ request.user.company.name }}
+            </p>
+            {% endif %}
+
+            <hr class="my-4">
+
+            <h2 class="h3 mb-4">Panel zarządzania</h2>
+
+            <div class="row g-4">
+
+                <!-- Produkty -->
+                <div class="col-md-6">
+                    <a href="/my-products/"
+                       class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body">
+                            <h4>📦 Produkty</h4>
+                            <p class="text-muted mb-0">
+                                Przegląd katalogu produktów.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Zamówienia -->
+                <div class="col-md-6">
+                    <a href="/company-orders/"
+                       class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body">
+                            <h4>🛒 Zamówienia</h4>
+                            <p class="text-muted mb-0">
+                                Przegląd i obsługa zamówień.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Pracownicy -->
+                <div class="col-md-6">
+                    <a href="/employees/"
+                       class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body">
+                            <h4>👨‍💼 Pracownicy</h4>
+                            <p class="text-muted mb-0">
+                                Zarządzanie kontami handlowców.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Katalog -->
+                <div class="col-md-6">
+                    <a href="/products/"
+                       class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body">
+                            <h4>🏪 Katalog</h4>
+                            <p class="text-muted mb-0">
+                                Podgląd publicznego katalogu produktów.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="mt-4">
+                <a href="/admin/" class="btn btn-outline-secondary">
+                    Otwórz panel administracyjny
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
