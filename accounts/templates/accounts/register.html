@@ -157,40 +157,23 @@ async function loadCompanyData() {
 
         console.log(data);
 
-        /*
-           CEIDG API может возвращать разные структуры.
-           Ниже универсальная попытка взять данные.
-        */
+        // Если ошибка
+        if (data.error) {
 
-        const company =
-            data.firma ||
-            data.company ||
-            data;
+            alert(data.error);
 
-        // Название фирмы
-        if (company.nazwa) {
-            document.getElementById('id_company_name').value =
-                company.nazwa;
+            return;
         }
 
-        // REGON
-        if (company.regon) {
-            document.getElementById('id_regon').value =
-                company.regon;
-        }
+        // Автозаполнение полей
+        document.getElementById('id_company_name').value =
+            data.name || '';
 
-        // Адрес
-        if (company.adresDzialalnosci) {
+        document.getElementById('id_regon').value =
+            data.regon || '';
 
-            const adres =
-                company.adresDzialalnosci.ulica + ' ' +
-                company.adresDzialalnosci.nrNieruchomosci + ', ' +
-                company.adresDzialalnosci.kodPocztowy + ' ' +
-                company.adresDzialalnosci.miejscowosc;
-
-            document.getElementById('id_address').value =
-                adres;
-        }
+        document.getElementById('id_address').value =
+            data.address || '';
 
     } catch (error) {
 
