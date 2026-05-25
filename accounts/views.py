@@ -3,6 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
+from bs4 import BeautifulSoup
+
 from .forms import CompanyRegistrationForm, EmployeeForm
 from .models import User
 
@@ -84,62 +86,80 @@ def get_company_data(request):
             'error': 'Brak NIP'
         }, status=400)
 
-    # Очистка NIP
+    # очистка NIP
     nip = nip.replace('-', '').replace(' ', '')
 
     url = (
-        "https://dane.biznes.gov.pl/api/ceidg/v2/"
-        f"firma?nip={nip}"
+        "https://aplikacja.ceidg.gov.pl/"
+        "CEIDG/CEIDG.Public.UI/Search.aspx"
     )
+
+    params = {
+        'nip': nip
+    }
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0'
+    }
 
     try:
 
         response = requests.get(
             url,
-            headers={
-                'Accept': 'application/json'
-            },
-            timeout=10
+            params=params,
+            headers=headers,
+            timeout=15
         )
 
-        print(response.status_code)
-        print(response.text)
+        html = response.text
 
-        if response.status_code != 200:
+        print(html)
+
+        # если фирма не найдена
+        if "Brak wpisów spełniających podane kryteria" in html:
+
             return JsonResponse({
                 'error': 'Firma nie istnieje'
             }, status=404)
 
-        data = response.json()
+        soup = BeautifulSoup(
+            html,
+            'html.parser'
+        )
 
-        firma = data.get('firma')
+        company_name = ''
+        regon = ''
 
-        if not firma:
-            return JsonResponse({
-                'error': 'Nie znaleziono firmy'
-            }, status=404)
+        # поиск названия фирмы
+        links = soup.find_all('a')
 
-        address = ''
+        for link in links:
 
-        adres = firma.get('adresDzialalnosci', {})
+            text = link.get_text(strip=True)
 
-        if adres:
+            if text and len(text) > 5:
 
-            parts = [
-                adres.get('ulica', ''),
-                adres.get('nrNieruchomosci', ''),
-                adres.get('kodPocztowy', ''),
-                adres.get('miejscowosc', ''),
-            ]
+                company_name = text
+                break
 
-            address = ' '.join(
-                [p for p in parts if p]
-            )
+        # поиск REGON
+        body_text = soup.get_text()
+
+        if 'REGON' in body_text:
+
+            lines = body_text.splitlines()
+
+            for i, line in enumerate(lines):
+
+                if 'REGON' in line and i + 1 < len(lines):
+
+                    regon = lines[i + 1].strip()
+                    break
 
         return JsonResponse({
-            'name': firma.get('nazwa', ''),
-            'regon': firma.get('regon', ''),
-            'address': address,
+            'name': company_name,
+            'regon': regon,
+            'address': '',
         })
 
     except Exception as e:
@@ -147,5 +167,5 @@ def get_company_data(request):
         print(e)
 
         return JsonResponse({
-            'error': 'Błąd CEIDG API'
+            'error': str(e)
         }, status=500)
