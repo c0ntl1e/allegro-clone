@@ -3,8 +3,6 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
-from bs4 import BeautifulSoup
-
 from .forms import CompanyRegistrationForm, EmployeeForm
 from .models import User
 
@@ -12,15 +10,21 @@ import requests
 
 
 def register_company(request):
+
     if request.method == 'POST':
+
         form = CompanyRegistrationForm(request.POST)
 
         if form.is_valid():
+
             user = form.save()
+
             login(request, user)
 
             return redirect('/dashboard/')
+
     else:
+
         form = CompanyRegistrationForm()
 
     return render(request, 'accounts/register.html', {
@@ -30,11 +34,13 @@ def register_company(request):
 
 @login_required
 def dashboard(request):
+
     return render(request, 'accounts/dashboard.html')
 
 
 @login_required
 def employees(request):
+
     if request.user.role != 'company':
         return redirect('/dashboard/')
 
@@ -50,13 +56,16 @@ def employees(request):
 
 @login_required
 def add_employee(request):
+
     if request.user.role != 'company':
         return redirect('/dashboard/')
 
     if request.method == 'POST':
+
         form = EmployeeForm(request.POST)
 
         if form.is_valid():
+
             employee = form.save(commit=False)
 
             employee.role = 'sales'
@@ -69,7 +78,9 @@ def add_employee(request):
             employee.save()
 
             return redirect('/employees/')
+
     else:
+
         form = EmployeeForm()
 
     return render(request, 'accounts/add_employee.html', {
@@ -82,6 +93,7 @@ def get_company_data(request):
     nip = request.GET.get('nip')
 
     if not nip:
+
         return JsonResponse({
             'error': 'Brak NIP'
         }, status=400)
@@ -90,82 +102,70 @@ def get_company_data(request):
     nip = nip.replace('-', '').replace(' ', '')
 
     url = (
-        "https://aplikacja.ceidg.gov.pl/"
-        "CEIDG/CEIDG.Public.UI/Search.aspx"
+        "https://nowe-firmy-ceidg-api.p.rapidapi.com/api/v1/active-companies"
     )
 
-    params = {
-        'nip': nip
+    querystring = {
+        "nip": nip
     }
 
     headers = {
-        'User-Agent': 'Mozilla/5.0'
+        "x-rapidapi-key": "fad7f1785cmsh4a819a5441c132bp15a35djsn9b96c5c809bb",
+        "x-rapidapi-host": "nowe-firmy-ceidg-api.p.rapidapi.com"
     }
 
     try:
 
         response = requests.get(
             url,
-            params=params,
             headers=headers,
-            timeout=15
+            params=querystring,
+            timeout=10
         )
 
-        html = response.text
+        print("STATUS:")
+        print(response.status_code)
 
-        print(html)
+        print("TEXT:")
+        print(response.text)
 
-        # если фирма не найдена
-        if "Brak wpisów spełniających podane kryteria" in html:
+        if response.status_code != 200:
 
             return JsonResponse({
                 'error': 'Firma nie istnieje'
             }, status=404)
 
-        soup = BeautifulSoup(
-            html,
-            'html.parser'
-        )
+        data = response.json()
 
-        company_name = ''
-        regon = ''
+        print("JSON:")
+        print(data)
 
-        # поиск названия фирмы
-        links = soup.find_all('a')
+        # если пришел список
+        if isinstance(data, list):
 
-        for link in links:
+            if len(data) == 0:
 
-            text = link.get_text(strip=True)
+                return JsonResponse({
+                    'error': 'Nie znaleziono firmy'
+                }, status=404)
 
-            if text and len(text) > 5:
+            firma = data[0]
 
-                company_name = text
-                break
+        else:
 
-        # поиск REGON
-        body_text = soup.get_text()
-
-        if 'REGON' in body_text:
-
-            lines = body_text.splitlines()
-
-            for i, line in enumerate(lines):
-
-                if 'REGON' in line and i + 1 < len(lines):
-
-                    regon = lines[i + 1].strip()
-                    break
+            firma = data
 
         return JsonResponse({
-            'name': company_name,
-            'regon': regon,
-            'address': '',
+            'name': firma.get('companyName', ''),
+            'regon': firma.get('regon', ''),
+            'address': firma.get('address', ''),
         })
 
     except Exception as e:
 
+        print("ERROR:")
         print(e)
 
         return JsonResponse({
-            'error': str(e)
+            'error': 'Błąd RapidAPI'
         }, status=500)
