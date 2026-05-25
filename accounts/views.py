@@ -103,7 +103,7 @@ def get_company_data(request):
 
     url = (
         "https://nowe-firmy-ceidg-api.p.rapidapi.com/"
-        "api/v1/future-companies"
+        "api/v1/active-companies"
     )
 
     headers = {
