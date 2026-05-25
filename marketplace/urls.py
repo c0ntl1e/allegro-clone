@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from accounts.views import (
+    get_company_data,
     register_company,
     dashboard,
     employees,
@@ -76,6 +77,12 @@ urlpatterns = [
 
     # Корзина
     path('cart/', include('cart.urls')),
+    
+    path(
+    'api/company-data/',
+    get_company_data,
+    name='company_data'
+),
 ]
 
 # Обслуживание media-файлов в режиме разработки
