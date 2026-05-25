@@ -93,14 +93,17 @@ def get_company_data(request):
     nip = request.GET.get('nip')
 
     if not nip:
+
         return JsonResponse({
             'error': 'Brak NIP'
         }, status=400)
 
+    # очистка NIP
     nip = nip.replace('-', '').replace(' ', '')
 
     url = (
-        "https://nowe-firmy-ceidg-api.p.rapidapi.com/api/v1/future-companies"
+        "https://nowe-firmy-ceidg-api.p.rapidapi.com/"
+        "api/v1/future-companies"
     )
 
     headers = {
@@ -119,10 +122,13 @@ def get_company_data(request):
             url,
             headers=headers,
             params=params,
-            timeout=10
+            timeout=15
         )
 
+        print("STATUS:")
         print(response.status_code)
+
+        print("TEXT:")
         print(response.text)
 
         data = response.json()
@@ -156,8 +162,9 @@ def get_company_data(request):
 
     except Exception as e:
 
+        print("ERROR:")
         print(e)
 
         return JsonResponse({
-            'error': 'Błąd RapidAPI'
+            'error': str(e)
         }, status=500)
