@@ -5,7 +5,20 @@ from .models import Product, Category
 from .forms import ProductForm
 
 
+def homepage(request):
+
+    products = Product.objects.all().order_by('-id')
+
+    categories = Category.objects.all()
+
+    return render(request, 'products/homepage.html', {
+        'products': products,
+        'categories': categories,
+    })
+
+
 def product_list(request):
+
     query = request.GET.get('q', '')
     category_id = request.GET.get('category', '')
 
@@ -16,13 +29,19 @@ def product_list(request):
 
     # Поиск по названию товара
     if query:
-        products = products.filter(name__icontains=query)
+
+        products = products.filter(
+            name__icontains=query
+        )
 
     # Фильтрация по категории
     if category_id:
-        products = products.filter(category_id=category_id)
 
-    # Список всех категорий
+        products = products.filter(
+            category_id=category_id
+        )
+
+    # Все категории
     categories = Category.objects.all()
 
     return render(request, 'products/product_list.html', {
@@ -34,6 +53,7 @@ def product_list(request):
 
 
 def product_detail(request, pk):
+
     product = get_object_or_404(
         Product.objects.select_related(
             'company',
@@ -49,27 +69,41 @@ def product_detail(request, pk):
 
 @login_required
 def add_product(request):
-    # Доступ только для konta firmy и konta handlowca
+
+    # Только firma / sales
     if request.user.role not in ['company', 'sales']:
+
         return redirect('/dashboard/')
 
-    # Определяем компанию пользователя
+    # Определяем компанию
     if request.user.role == 'company':
+
         company = request.user.owned_company
+
     else:
+
         company = request.user.company
 
     # Обработка формы
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
+
+        form = ProductForm(
+            request.POST,
+            request.FILES
+        )
 
         if form.is_valid():
+
             product = form.save(commit=False)
+
             product.company = company
+
             product.save()
 
             return redirect('/my-products/')
+
     else:
+
         form = ProductForm()
 
     return render(request, 'products/add_product.html', {
@@ -79,17 +113,21 @@ def add_product(request):
 
 @login_required
 def my_products(request):
-    # Доступ только для konta firmy и konta handlowca
+
+    # Только firma / sales
     if request.user.role not in ['company', 'sales']:
+
         return redirect('/dashboard/')
 
-    # Определяем компанию пользователя
+    # Компания пользователя
     if request.user.role == 'company':
+
         company = request.user.owned_company
+
     else:
+
         company = request.user.company
 
-    # Получаем только товары текущей компании
     products = Product.objects.filter(
         company=company
     ).select_related('category')
@@ -101,25 +139,30 @@ def my_products(request):
 
 @login_required
 def edit_product(request, pk):
-    # Доступ только для konta firmy и konta handlowca
+
+    # Только firma / sales
     if request.user.role not in ['company', 'sales']:
+
         return redirect('/dashboard/')
 
-    # Определяем компанию пользователя
+    # Компания пользователя
     if request.user.role == 'company':
+
         company = request.user.owned_company
+
     else:
+
         company = request.user.company
 
-    # Ищем только товары текущей компании
     product = get_object_or_404(
         Product,
         pk=pk,
         company=company
     )
 
-    # Обработка формы редактирования
+    # Редактирование
     if request.method == 'POST':
+
         form = ProductForm(
             request.POST,
             request.FILES,
@@ -127,9 +170,13 @@ def edit_product(request, pk):
         )
 
         if form.is_valid():
+
             form.save()
+
             return redirect('/my-products/')
+
     else:
+
         form = ProductForm(instance=product)
 
     return render(request, 'products/edit_product.html', {
@@ -140,36 +187,34 @@ def edit_product(request, pk):
 
 @login_required
 def delete_product(request, pk):
-    # Доступ только для konta firmy и konta handlowca
+
+    # Только firma / sales
     if request.user.role not in ['company', 'sales']:
+
         return redirect('/dashboard/')
 
-    # Определяем компанию пользователя
+    # Компания пользователя
     if request.user.role == 'company':
+
         company = request.user.owned_company
+
     else:
+
         company = request.user.company
 
-    # Ищем только товары текущей компании
     product = get_object_or_404(
         Product,
         pk=pk,
         company=company
     )
 
-    # Удаление товара
+    # Удаление
     if request.method == 'POST':
+
         product.delete()
+
         return redirect('/my-products/')
 
     return render(request, 'products/delete_product.html', {
         'product': product
-    })
-    
-def homepage(request):
-
-    products = Product.objects.all().order_by('-id')[:12]
-
-    return render(request, 'products/homepage.html', {
-        'products': products
     })

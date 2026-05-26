@@ -2,13 +2,22 @@ from django.db import models
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    slug = models.SlugField(
+        unique=True
+    )
 
     def __str__(self):
+
         return self.name
 
 
 class Product(models.Model):
+
     company = models.ForeignKey(
         'companies.Company',
         on_delete=models.CASCADE,
@@ -19,13 +28,24 @@ class Product(models.Model):
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='products'
     )
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(
+        max_length=255
+    )
+
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=0)
+
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    quantity = models.PositiveIntegerField(
+        default=0
+    )
 
     image = models.ImageField(
         upload_to='products/',
@@ -33,7 +53,6 @@ class Product(models.Model):
         null=True
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
+
         return self.name
