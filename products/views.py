@@ -165,3 +165,11 @@ def delete_product(request, pk):
     return render(request, 'products/delete_product.html', {
         'product': product
     })
+    
+def homepage(request):
+
+    products = Product.objects.all().order_by('-id')[:12]
+
+    return render(request, 'products/homepage.html', {
+        'products': products
+    })

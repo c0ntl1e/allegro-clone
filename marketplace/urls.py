@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from products.views import homepage
 
 from accounts.views import (
     get_company_data,
@@ -28,6 +29,9 @@ from products.views import (
 )
 
 urlpatterns = [
+    
+    path('', homepage, name='homepage'),
+    
     # Главная страница сайта → каталог товаров
     path('', product_list, name='home'),
 
