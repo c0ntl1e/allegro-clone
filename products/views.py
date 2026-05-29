@@ -56,15 +56,15 @@ def homepage(request):
 
     elif sort == 'newest':
 
-        products = products.order_by('-created_at')
+        products = products.order_by('-id')
 
     elif sort == 'oldest':
 
-        products = products.order_by('created_at')
+        products = products.order_by('id')
 
     else:
 
-        products = products.order_by('-created_at')
+        products = products.order_by('-id')
 
     return render(request, 'products/homepage.html', {
         'products': products,
