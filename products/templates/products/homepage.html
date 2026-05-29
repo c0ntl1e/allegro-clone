@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -53,124 +52,97 @@ body{
 }
 
 .search-bar{
-
-    width:90%;
+    width:95%;
     margin:20px auto;
-
     display:flex;
     gap:10px;
 }
 
 .search-bar input{
-
     flex:1;
-
     padding:12px;
-
     border:none;
     border-radius:8px;
 }
 
 .search-bar button{
-
     padding:12px 20px;
-
     border:none;
-
     background:#002f34;
     color:white;
-
     border-radius:8px;
-
     cursor:pointer;
 }
 
 .content{
-
     width:95%;
     margin:auto;
-
     display:flex;
-
     gap:20px;
 }
 
 .sidebar{
-
-    width:260px;
-
+    width:280px;
     background:white;
-
     padding:20px;
-
     border-radius:10px;
-
     height:fit-content;
 }
 
-.sidebar h3{
-    margin-bottom:15px;
+.sidebar details{
+    margin-bottom:20px;
+}
+
+.sidebar summary{
+    cursor:pointer;
+    font-size:18px;
+    font-weight:bold;
+    padding:10px 0;
 }
 
 .sidebar a{
-
     display:block;
-
     padding:8px 0;
-
-    text-decoration:none;
-
     color:#002f34;
+    text-decoration:none;
+}
+
+.sidebar a:hover{
+    color:#ffb800;
 }
 
 .main{
-
     flex:1;
 }
 
 .sort-box{
-
     background:white;
-
     padding:15px;
-
     border-radius:10px;
-
     margin-bottom:20px;
 }
 
 .sort-box select{
-
-    padding:8px;
+    padding:10px;
+    border-radius:6px;
 }
 
 .products{
-
     display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(280px,1fr));
-
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
     gap:20px;
 }
 
 .product{
-
     background:white;
-
     border-radius:12px;
-
     overflow:hidden;
-
     box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 
 .product img{
-
     width:100%;
-
-    height:240px;
-
+    height:250px;
     object-fit:cover;
 }
 
@@ -179,46 +151,31 @@ body{
 }
 
 .product-price{
-
     font-size:28px;
-
     font-weight:bold;
-
     color:#ffb800;
+    margin-top:10px;
 }
 
 .product-company{
-
     color:#777;
-
     margin-top:10px;
 }
 
 .product-button{
-
     display:block;
-
     text-align:center;
-
     background:#ffb800;
-
     color:#002f34;
-
     text-decoration:none;
-
     padding:12px;
-
     border-radius:8px;
-
     margin-top:15px;
-
     font-weight:bold;
 }
 
 </style>
-
 </head>
-
 <body>
 
 <div class="navbar">
@@ -252,6 +209,24 @@ body{
             value="{{ query }}"
         >
 
+        <input
+            type="hidden"
+            name="category"
+            value="{{ selected_category }}"
+        >
+
+        <input
+            type="hidden"
+            name="company"
+            value="{{ selected_company }}"
+        >
+
+        <input
+            type="hidden"
+            name="sort"
+            value="{{ selected_sort }}"
+        >
+
         <button type="submit">
             Szukaj
         </button>
@@ -264,29 +239,37 @@ body{
 
     <div class="sidebar">
 
-        <h3>Kategorie</h3>
+        <details open>
 
-        <a href="/">Wszystkie</a>
+            <summary>Kategorie</summary>
 
-        {% for category in categories %}
-
-            <a href="?category={{ category.id }}">
-                {{ category.name }}
+            <a href="/">
+                Wszystkie
             </a>
 
-        {% endfor %}
+            {% for category in categories %}
 
-        <hr style="margin:20px 0;">
+                <a href="?category={{ category.id }}&company={{ selected_company }}&sort={{ selected_sort }}&q={{ query }}">
+                    {{ category.name }}
+                </a>
 
-        <h3>Firmy</h3>
+            {% endfor %}
 
-        {% for company in companies %}
+        </details>
 
-            <a href="?company={{ company.id }}">
-                {{ company.name }}
-            </a>
+        <details>
 
-        {% endfor %}
+            <summary>Firmy</summary>
+
+            {% for company in companies %}
+
+                <a href="?company={{ company.id }}&category={{ selected_category }}&sort={{ selected_sort }}&q={{ query }}">
+                    {{ company.name }}
+                </a>
+
+            {% endfor %}
+
+        </details>
 
     </div>
 
@@ -296,25 +279,36 @@ body{
 
             <form method="GET">
 
-                <select name="sort" onchange="this.form.submit()">
+                <input type="hidden" name="q" value="{{ query }}">
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                <input type="hidden" name="company" value="{{ selected_company }}">
+
+                <select
+                    name="sort"
+                    onchange="this.form.submit()"
+                >
 
                     <option value="">
                         Sortowanie
                     </option>
 
-                    <option value="price_asc">
+                    <option value="price_asc"
+                    {% if selected_sort == 'price_asc' %}selected{% endif %}>
                         Cena rosnąco
                     </option>
 
-                    <option value="price_desc">
+                    <option value="price_desc"
+                    {% if selected_sort == 'price_desc' %}selected{% endif %}>
                         Cena malejąco
                     </option>
 
-                    <option value="newest">
+                    <option value="newest"
+                    {% if selected_sort == 'newest' %}selected{% endif %}>
                         Najnowsze
                     </option>
 
-                    <option value="oldest">
+                    <option value="oldest"
+                    {% if selected_sort == 'oldest' %}selected{% endif %}>
                         Najstarsze
                     </option>
 
@@ -331,16 +325,12 @@ body{
             <div class="product">
 
                 {% if product.image %}
-
                     <img src="{{ product.image.url }}">
-
                 {% endif %}
 
                 <div class="product-content">
 
-                    <h3>
-                        {{ product.name }}
-                    </h3>
+                    <h3>{{ product.name }}</h3>
 
                     <p>
                         {{ product.description|truncatechars:80 }}
