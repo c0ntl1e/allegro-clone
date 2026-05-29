@@ -99,38 +99,7 @@ def homepage(request):
 
 
 def product_list(request):
-
-    query = request.GET.get('q', '')
-    category_id = request.GET.get('category', '')
-
-    products = Product.objects.select_related(
-        'company',
-        'category'
-    ).all()
-
-    # Поиск по названию товара
-    if query:
-
-        products = products.filter(
-            name__icontains=query
-        )
-
-    # Фильтрация по категории
-    if category_id:
-
-        products = products.filter(
-            category_id=category_id
-        )
-
-    # Все категории
-    categories = Category.objects.all()
-
-    return render(request, 'products/product_list.html', {
-        'products': products,
-        'query': query,
-        'categories': categories,
-        'selected_category': category_id,
-    })
+    return homepage(request)
 
 
 def product_detail(request, pk):
