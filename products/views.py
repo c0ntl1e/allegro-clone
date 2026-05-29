@@ -7,13 +7,73 @@ from .forms import ProductForm
 
 def homepage(request):
 
-    products = Product.objects.all().order_by('-id')
+    products = Product.objects.select_related(
+        'company',
+        'category'
+    ).all()
 
     categories = Category.objects.all()
+
+    companies = []
+
+    for product in Product.objects.select_related('company'):
+        if product.company not in companies:
+            companies.append(product.company)
+
+    query = request.GET.get('q', '')
+
+    category = request.GET.get('category')
+
+    company = request.GET.get('company')
+
+    sort = request.GET.get('sort')
+
+    if query:
+
+        products = products.filter(
+            name__icontains=query
+        )
+
+    if category:
+
+        products = products.filter(
+            category_id=category
+        )
+
+    if company:
+
+        products = products.filter(
+            company_id=company
+        )
+
+    if sort == 'price_asc':
+
+        products = products.order_by('price')
+
+    elif sort == 'price_desc':
+
+        products = products.order_by('-price')
+
+    elif sort == 'newest':
+
+        products = products.order_by('-created_at')
+
+    elif sort == 'oldest':
+
+        products = products.order_by('created_at')
+
+    else:
+
+        products = products.order_by('-created_at')
 
     return render(request, 'products/homepage.html', {
         'products': products,
         'categories': categories,
+        'companies': companies,
+        'query': query,
+        'selected_category': category,
+        'selected_company': company,
+        'selected_sort': sort,
     })
 
 
