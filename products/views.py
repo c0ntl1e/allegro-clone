@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Product, Category
 from .forms import ProductForm
-
+from django.core.paginator import Paginator
 
 def homepage(request):
 
@@ -21,29 +21,36 @@ def homepage(request):
             companies.append(product.company)
 
     query = request.GET.get('q', '')
-
     category = request.GET.get('category')
-
     company = request.GET.get('company')
-
     sort = request.GET.get('sort')
 
-    if query:
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
 
+    if query:
         products = products.filter(
             name__icontains=query
         )
 
     if category and category != 'None':
-   
         products = products.filter(
             category_id=category
         )
 
     if company and company != 'None':
-        
         products = products.filter(
             company_id=company
+        )
+
+    if min_price:
+        products = products.filter(
+            price__gte=min_price
+        )
+
+    if max_price:
+        products = products.filter(
+            price__lte=max_price
         )
 
     if sort == 'price_asc':
@@ -54,10 +61,6 @@ def homepage(request):
 
         products = products.order_by('-price')
 
-    elif sort == 'newest':
-
-        products = products.order_by('-id')
-
     elif sort == 'oldest':
 
         products = products.order_by('id')
@@ -66,14 +69,32 @@ def homepage(request):
 
         products = products.order_by('-id')
 
+    category_counts = {}
+
+    for cat in categories:
+
+        category_counts[cat.id] = Product.objects.filter(
+            category=cat
+        ).count()
+
+    paginator = Paginator(products, 8)
+
+    page_number = request.GET.get('page')
+
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'products/homepage.html', {
-        'products': products,
+        'products': page_obj,
+        'page_obj': page_obj,
         'categories': categories,
         'companies': companies,
+        'category_counts': category_counts,
         'query': query,
         'selected_category': category,
         'selected_company': company,
         'selected_sort': sort,
+        'min_price': min_price,
+        'max_price': max_price,
     })
 
 
