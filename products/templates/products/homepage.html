@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -89,10 +90,6 @@ body{
     height:fit-content;
 }
 
-.sidebar details{
-    margin-bottom:20px;
-}
-
 .sidebar summary{
     cursor:pointer;
     font-size:18px;
@@ -111,6 +108,24 @@ body{
     color:#ffb800;
 }
 
+.price-input{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border:1px solid #ddd;
+    border-radius:6px;
+}
+
+.filter-btn{
+    width:100%;
+    padding:10px;
+    background:#ffb800;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
 .main{
     flex:1;
 }
@@ -120,11 +135,6 @@ body{
     padding:15px;
     border-radius:10px;
     margin-bottom:20px;
-}
-
-.sort-box select{
-    padding:10px;
-    border-radius:6px;
 }
 
 .products{
@@ -174,8 +184,21 @@ body{
     font-weight:bold;
 }
 
+.pagination{
+    text-align:center;
+    margin-top:40px;
+}
+
+.pagination a{
+    text-decoration:none;
+    margin:0 10px;
+    color:#002f34;
+    font-weight:bold;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="navbar">
@@ -221,6 +244,39 @@ body{
 
     <div class="sidebar">
 
+        <form method="GET">
+
+            <h3 style="margin-bottom:15px;">
+                Cena
+            </h3>
+
+            <input
+                type="number"
+                name="min_price"
+                placeholder="Od"
+                value="{{ min_price }}"
+                class="price-input"
+            >
+
+            <input
+                type="number"
+                name="max_price"
+                placeholder="Do"
+                value="{{ max_price }}"
+                class="price-input"
+            >
+
+            <button
+                type="submit"
+                class="filter-btn"
+            >
+                Filtruj
+            </button>
+
+        </form>
+
+        <hr style="margin:20px 0;">
+
         <details open>
 
             <summary>Kategorie</summary>
@@ -232,12 +288,18 @@ body{
             {% for category in categories %}
 
                 <a href="?category={{ category.id }}">
+
                     {{ category.name }}
+
+                    ({{ category_counts|get_item:category.id }})
+
                 </a>
 
             {% endfor %}
 
         </details>
+
+        <hr style="margin:20px 0;">
 
         <details>
 
@@ -264,29 +326,26 @@ body{
                 <select
                     name="sort"
                     onchange="this.form.submit()"
+                    style="padding:10px;"
                 >
 
                     <option value="">
                         Sortowanie
                     </option>
 
-                    <option value="price_asc"
-                    {% if selected_sort == 'price_asc' %}selected{% endif %}>
+                    <option value="price_asc">
                         Cena rosnąco
                     </option>
 
-                    <option value="price_desc"
-                    {% if selected_sort == 'price_desc' %}selected{% endif %}>
+                    <option value="price_desc">
                         Cena malejąco
                     </option>
 
-                    <option value="newest"
-                    {% if selected_sort == 'newest' %}selected{% endif %}>
+                    <option value="newest">
                         Najnowsze
                     </option>
 
-                    <option value="oldest"
-                    {% if selected_sort == 'oldest' %}selected{% endif %}>
+                    <option value="oldest">
                         Najstarsze
                     </option>
 
@@ -308,7 +367,9 @@ body{
 
                 <div class="product-content">
 
-                    <h3>{{ product.name }}</h3>
+                    <h3>
+                        {{ product.name }}
+                    </h3>
 
                     <p>
                         {{ product.description|truncatechars:80 }}
@@ -335,9 +396,41 @@ body{
 
             {% empty %}
 
-            <p>Brak produktów.</p>
+                <p>Brak produktów.</p>
 
             {% endfor %}
+
+        </div>
+
+        <div class="pagination">
+
+            {% if page_obj.has_previous %}
+
+                <a href="?page={{ page_obj.previous_page_number }}">
+                    ← Poprzednia
+                </a>
+
+            {% endif %}
+
+            <strong>
+
+                Strona
+
+                {{ page_obj.number }}
+
+                z
+
+                {{ page_obj.paginator.num_pages }}
+
+            </strong>
+
+            {% if page_obj.has_next %}
+
+                <a href="?page={{ page_obj.next_page_number }}">
+                    Następna →
+                </a>
+
+            {% endif %}
 
         </div>
 
