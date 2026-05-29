@@ -34,14 +34,14 @@ def homepage(request):
             name__icontains=query
         )
 
-    if category:
-
+    if category and category != 'None':
+   
         products = products.filter(
             category_id=category
         )
 
-    if company:
-
+    if company and company != 'None':
+        
         products = products.filter(
             company_id=company
         )

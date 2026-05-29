@@ -209,24 +209,6 @@ body{
             value="{{ query }}"
         >
 
-        <input
-            type="hidden"
-            name="category"
-            value="{{ selected_category }}"
-        >
-
-        <input
-            type="hidden"
-            name="company"
-            value="{{ selected_company }}"
-        >
-
-        <input
-            type="hidden"
-            name="sort"
-            value="{{ selected_sort }}"
-        >
-
         <button type="submit">
             Szukaj
         </button>
@@ -249,7 +231,7 @@ body{
 
             {% for category in categories %}
 
-                <a href="?category={{ category.id }}&company={{ selected_company }}&sort={{ selected_sort }}&q={{ query }}">
+                <a href="?category={{ category.id }}">
                     {{ category.name }}
                 </a>
 
@@ -263,7 +245,7 @@ body{
 
             {% for company in companies %}
 
-                <a href="?company={{ company.id }}&category={{ selected_category }}&sort={{ selected_sort }}&q={{ query }}">
+                <a href="?company={{ company.id }}">
                     {{ company.name }}
                 </a>
 
@@ -278,10 +260,6 @@ body{
         <div class="sort-box">
 
             <form method="GET">
-
-                <input type="hidden" name="q" value="{{ query }}">
-                <input type="hidden" name="category" value="{{ selected_category }}">
-                <input type="hidden" name="company" value="{{ selected_company }}">
 
                 <select
                     name="sort"
@@ -354,6 +332,10 @@ body{
                 </div>
 
             </div>
+
+            {% empty %}
+
+            <p>Brak produktów.</p>
 
             {% endfor %}
 
