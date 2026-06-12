@@ -19,6 +19,8 @@ from accounts.admin_views import (
     delete_user,
     admin_products,
     admin_delete_product,
+    admin_orders,
+    admin_change_order_status,
 )
 
 from orders.views import (
@@ -181,6 +183,18 @@ urlpatterns = [
         'admin-products/<int:product_id>/delete/',
         admin_delete_product,
         name='admin_delete_product'
+    ),
+    
+        path(
+        'admin-orders/',
+        admin_orders,
+        name='admin_orders'
+    ),
+
+    path(
+        'admin-orders/<int:order_id>/status/',
+        admin_change_order_status,
+        name='admin_change_order_status'
     ),
 
     # Cart

@@ -118,3 +118,47 @@ def admin_delete_product(request, product_id):
     product.delete()
 
     return redirect('/admin-products/')
+
+@login_required
+def admin_orders(request):
+
+    if request.user.role != 'admin':
+        return redirect('/dashboard/')
+
+    orders = Order.objects.select_related(
+        'customer'
+    ).all().order_by('-id')
+
+    return render(
+        request,
+        'accounts/admin_orders.html',
+        {
+            'orders': orders
+        }
+    )
+
+
+@login_required
+def admin_change_order_status(request, order_id):
+
+    if request.user.role != 'admin':
+        return redirect('/dashboard/')
+
+    order = get_object_or_404(
+        Order,
+        id=order_id
+    )
+
+    status = request.POST.get('status')
+
+    if status in [
+        'new',
+        'processing',
+        'shipped',
+        'completed',
+        'cancelled'
+    ]:
+        order.status = status
+        order.save()
+
+    return redirect('/admin-orders/')
