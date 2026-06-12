@@ -16,6 +16,9 @@ from accounts.admin_views import (
     admin_panel,
     users_list,
     change_user_role,
+    delete_user,
+    admin_products,
+    admin_delete_product,
 )
 
 from orders.views import (
@@ -37,17 +40,10 @@ from products.views import (
 urlpatterns = [
 
     # Homepage
-    path(
-        '',
-        homepage,
-        name='homepage'
-    ),
+    path('', homepage, name='homepage'),
 
     # Django Admin
-    path(
-        'admin/',
-        admin.site.urls
-    ),
+    path('admin/', admin.site.urls),
 
     # Register
     path(
@@ -169,6 +165,24 @@ urlpatterns = [
         name='change_user_role'
     ),
 
+    path(
+        'admin-users/<int:user_id>/delete/',
+        delete_user,
+        name='delete_user'
+    ),
+
+    path(
+        'admin-products/',
+        admin_products,
+        name='admin_products'
+    ),
+
+    path(
+        'admin-products/<int:product_id>/delete/',
+        admin_delete_product,
+        name='admin_delete_product'
+    ),
+
     # Cart
     path(
         'cart/',
@@ -184,7 +198,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
