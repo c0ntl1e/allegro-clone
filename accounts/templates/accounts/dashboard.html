@@ -36,6 +36,7 @@
         </a>
 
         <div class="d-flex align-items-center gap-3">
+
             <span class="text-dark fw-semibold">
                 {{ request.user.username }}
             </span>
@@ -46,12 +47,15 @@
                     Wyloguj się
                 </button>
             </form>
+
         </div>
     </div>
 </nav>
 
 <div class="container mt-5 mb-5">
+
     <div class="card shadow-lg border-0 rounded-4">
+
         <div class="card-body p-5">
 
             <h1 class="mb-4">
@@ -59,22 +63,25 @@
             </h1>
 
             <p>
-                <strong>Rola:</strong> {{ request.user.role }}
+                <strong>Rola:</strong>
+                {{ request.user.role }}
             </p>
 
             {% if request.user.company %}
             <p>
-                <strong>Firma:</strong> {{ request.user.company.name }}
+                <strong>Firma:</strong>
+                {{ request.user.company.name }}
             </p>
             {% endif %}
 
             <hr class="my-4">
 
-            <h2 class="h3 mb-4">Panel zarządzania</h2>
+            <h2 class="h3 mb-4">
+                Panel zarządzania
+            </h2>
 
             <div class="row g-4">
 
-                <!-- Produkty -->
                 <div class="col-md-6">
                     <a href="/my-products/"
                        class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
@@ -87,7 +94,6 @@
                     </a>
                 </div>
 
-                <!-- Zamówienia -->
                 <div class="col-md-6">
                     <a href="/company-orders/"
                        class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
@@ -100,7 +106,6 @@
                     </a>
                 </div>
 
-                <!-- Pracownicy -->
                 <div class="col-md-6">
                     <a href="/employees/"
                        class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
@@ -113,7 +118,6 @@
                     </a>
                 </div>
 
-                <!-- Katalog -->
                 <div class="col-md-6">
                     <a href="/products/"
                        class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
@@ -126,16 +130,33 @@
                     </a>
                 </div>
 
+                <div class="col-md-6">
+                    <a href="/messages/"
+                       class="dashboard-card card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body">
+                            <h4>💬 Wiadomości</h4>
+                            <p class="text-muted mb-0">
+                                Rozmowy z klientami i użytkownikami.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+
             </div>
 
             <div class="mt-4">
-                <a href="/admin-panel/" class="btn btn-outline-secondary">
+
+                <a href="/admin-panel/"
+                   class="btn btn-outline-secondary">
                     Otwórz panel administracyjny
                 </a>
+
             </div>
 
         </div>
+
     </div>
+
 </div>
 
 </body>

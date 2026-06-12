@@ -196,6 +196,11 @@ urlpatterns = [
         admin_change_order_status,
         name='admin_change_order_status'
     ),
+    
+    path(
+    'messages/',
+    include('messages_app.urls')
+    ),
 
     # Cart
     path(
@@ -204,7 +209,7 @@ urlpatterns = [
     ),
 
     # API Company Data
-    path(
+    path(   
         'api/company-data/',
         get_company_data,
         name='company_data'
