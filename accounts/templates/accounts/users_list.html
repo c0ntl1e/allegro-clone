@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Users</title>
+</head>
+<body>
+
+<h1>Użytkownicy</h1>
+
+<table border="1">
+
+<tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Role</th>
+    <th>Zmiana</th>
+</tr>
+
+{% for user in users %}
+
+<tr>
+
+    <td>{{ user.id }}</td>
+
+    <td>{{ user.username }}</td>
+
+    <td>{{ user.role }}</td>
+
+    <td>
+
+        <form
+            method="post"
+            action="/admin-users/{{ user.id }}/role/"
+        >
+
+            {% csrf_token %}
+
+            <select name="role">
+
+                <option value="admin">
+                    Administrator
+                </option>
+
+                <option value="company">
+                    Firma
+                </option>
+
+                <option value="sales">
+                    Sprzedawca
+                </option>
+
+            </select>
+
+            <button type="submit">
+                Zapisz
+            </button>
+
+        </form>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

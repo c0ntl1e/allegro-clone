@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
-from products.views import homepage
 
 from accounts.views import (
     get_company_data,
@@ -13,6 +12,12 @@ from accounts.views import (
     add_employee,
 )
 
+from accounts.admin_views import (
+    admin_panel,
+    users_list,
+    change_user_role,
+)
+
 from orders.views import (
     create_order,
     company_orders,
@@ -20,6 +25,7 @@ from orders.views import (
 )
 
 from products.views import (
+    homepage,
     product_list,
     product_detail,
     add_product,
@@ -29,20 +35,35 @@ from products.views import (
 )
 
 urlpatterns = [
-    
-    path('', homepage, name='homepage'),
-    
-    # Главная страница сайта → каталог товаров
-    path('', product_list, name='home'),
+
+    # Homepage
+    path(
+        '',
+        homepage,
+        name='homepage'
+    ),
 
     # Django Admin
-    path('admin/', admin.site.urls),
+    path(
+        'admin/',
+        admin.site.urls
+    ),
 
-    # Регистрация и панель пользователя
-    path('register/', register_company, name='register_company'),
-    path('dashboard/', dashboard, name='dashboard'),
+    # Register
+    path(
+        'register/',
+        register_company,
+        name='register_company'
+    ),
 
-    # Авторизация
+    # Dashboard
+    path(
+        'dashboard/',
+        dashboard,
+        name='dashboard'
+    ),
+
+    # Login
     path(
         'login/',
         auth_views.LoginView.as_view(
@@ -51,7 +72,7 @@ urlpatterns = [
         name='login'
     ),
 
-    # Выход из аккаунта
+    # Logout
     path(
         'logout/',
         auth_views.LogoutView.as_view(
@@ -60,37 +81,110 @@ urlpatterns = [
         name='logout'
     ),
 
-    # Товары
-    path('products/', product_list, name='product_list'),
-    path('products/add/', add_product, name='add_product'),
-    path('products/<int:pk>/', product_detail, name='product_detail'),
-    path('my-products/', my_products, name='my_products'),
-    path('products/<int:pk>/edit/', edit_product, name='edit_product'),
-    path('products/<int:pk>/delete/', delete_product, name='delete_product'),
-
-    # Сотрудники компании
-    path('employees/', employees, name='employees'),
-    path('employees/add/', add_employee, name='add_employee'),
-
-    # Заказы компании
-    path('company-orders/', company_orders, name='company_orders'),
-    path('company-orders/<int:pk>/', order_detail, name='order_detail'),
-
-    # Создание заказа
-    path('orders/create/', create_order, name='create_order'),
-
-    # Корзина
-    path('cart/', include('cart.urls')),
-    
+    # Products
     path(
-    'api/company-data/',
-    get_company_data,
-    name='company_data'
-),
+        'products/',
+        product_list,
+        name='product_list'
+    ),
+
+    path(
+        'products/add/',
+        add_product,
+        name='add_product'
+    ),
+
+    path(
+        'products/<int:pk>/',
+        product_detail,
+        name='product_detail'
+    ),
+
+    path(
+        'products/<int:pk>/edit/',
+        edit_product,
+        name='edit_product'
+    ),
+
+    path(
+        'products/<int:pk>/delete/',
+        delete_product,
+        name='delete_product'
+    ),
+
+    path(
+        'my-products/',
+        my_products,
+        name='my_products'
+    ),
+
+    # Employees
+    path(
+        'employees/',
+        employees,
+        name='employees'
+    ),
+
+    path(
+        'employees/add/',
+        add_employee,
+        name='add_employee'
+    ),
+
+    # Orders
+    path(
+        'orders/create/',
+        create_order,
+        name='create_order'
+    ),
+
+    path(
+        'company-orders/',
+        company_orders,
+        name='company_orders'
+    ),
+
+    path(
+        'company-orders/<int:pk>/',
+        order_detail,
+        name='order_detail'
+    ),
+
+    # Admin Panel
+    path(
+        'admin-panel/',
+        admin_panel,
+        name='admin_panel'
+    ),
+
+    path(
+        'admin-users/',
+        users_list,
+        name='users_list'
+    ),
+
+    path(
+        'admin-users/<int:user_id>/role/',
+        change_user_role,
+        name='change_user_role'
+    ),
+
+    # Cart
+    path(
+        'cart/',
+        include('cart.urls')
+    ),
+
+    # API Company Data
+    path(
+        'api/company-data/',
+        get_company_data,
+        name='company_data'
+    ),
 ]
 
-# Обслуживание media-файлов в режиме разработки
 if settings.DEBUG:
+
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
